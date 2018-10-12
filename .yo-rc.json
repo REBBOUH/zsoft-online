@@ -1,0 +1,41 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.zsoft",
+      "nativeLanguage": "fr"
+    },
+    "jhipsterVersion": "5.4.2",
+    "applicationType": "monolith",
+    "baseName": "zonline",
+    "packageName": "com.zsoft",
+    "packageFolder": "com/zsoft",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": true,
+    "websocket": "spring-websocket",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "mariadb",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "NmIyZDJmOTE1MDMyMzFkMDRhOWExNzA2NzE2NzVjMmY2NzM4YjMxNzk3NjM4ZmJjYTNjZDY2YTBhNDg2MTFkYTExYmQ0NmEyYzJlZjFlZmI0YWMzYWJjNzlmZmNhZTUwODM0ZjUxZjliYjZmMGM3ZjU5NGEzODIwYWFjMDE3NDg=",
+    "clientFramework": "angularX",
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "testFrameworks": [
+      "cucumber",
+      "protractor"
+    ],
+    "jhiPrefix": "jhi",
+    "enableTranslation": true,
+    "nativeLanguage": "fr",
+    "languages": [
+      "fr",
+      "en"
+    ]
+  }
+}

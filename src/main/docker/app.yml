@@ -1,0 +1,15 @@
+version: '2'
+services:
+    zonline-app:
+        image: zonline
+        environment:
+            # - _JAVA_OPTIONS=-Xmx512m -Xms256m
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATASOURCE_URL=jdbc:mariadb://zonline-mariadb:3306/zonline
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+        ports:
+            - 8080:8080
+    zonline-mariadb:
+        extends:
+            file: mariadb.yml
+            service: zonline-mariadb
