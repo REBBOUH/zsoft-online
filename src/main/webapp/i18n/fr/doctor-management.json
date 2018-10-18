@@ -1,0 +1,9 @@
+{
+    "doctorManagment":{
+        "home": {
+            "title": "Médcins",
+            "createLabel": "Créer un nouvel médcin",
+            "createOrEditLabel": "Créer ou éditer un médcin"
+        }
+    }
+}
