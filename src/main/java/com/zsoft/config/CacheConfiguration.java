@@ -39,6 +39,9 @@ public class CacheConfiguration {
             cm.createCache(com.zsoft.domain.Authority.class.getName(), jcacheConfiguration);
             cm.createCache(com.zsoft.domain.User.class.getName() + ".authorities", jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
+            cm.createCache(com.zsoft.domain.Doctor.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.Timeslot.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.Appointment.class.getName(), jcacheConfiguration);
         };
     }
 }
