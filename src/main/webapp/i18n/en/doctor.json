@@ -1,0 +1,36 @@
+{
+    "doctor": {
+        "managment": {
+            "home": {
+                "title": "Doctors",
+                "createOrEditLabel": "Create or edit a Doctor Profile"
+            },
+            "myprofile": {
+                "title": "My Profile"
+            },
+            "name": "Name",
+            "phone": "Phone",
+            "email": "Email",
+            "speciality": "Speciality",
+            "address": "Address",
+            "gender": "Gender",
+            "timeslots": "Time Slots",
+            "doctorprofile": "Doctor Profile",
+            "day": "Day",
+            "timeStart": "Time Start",
+            "timeEnd": "Time End"
+        },
+        "messages": {
+            "created": "A new Doctor profile is created with identifier {{ param }}",
+            "updated": "An Doctor profile is updated with identifier {{ param }}"
+        },
+        "menu": {
+            "mydoctorprofile": "My Doctor Profile",
+            "alldoctors": "All Doctors"
+        },
+        "actions": {
+            "add": "Add",
+            "remove": "Remove"
+        }
+    }
+}

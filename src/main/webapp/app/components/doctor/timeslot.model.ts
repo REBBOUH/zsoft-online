@@ -1,17 +1,17 @@
 export interface ITimeSlot {
     id?: any;
-    DayOfWeek?: number;
+    dayOfWeek?: number;
     timeStart?: string;
     timeEnd?: string;
-    Status?: boolean;
+    status?: boolean;
 }
 
 export class TimeSlot implements ITimeSlot {
-    constructor(public id?: any, public DayOfWeek?: number, public timeStart?: string, public timeEnd?: string, public Status?: boolean) {
+    constructor(public id?: any, public dayOfWeek?: number, public timeStart?: string, public timeEnd?: string, public status?: boolean) {
         this.id = id ? id : null;
-        this.DayOfWeek = DayOfWeek ? DayOfWeek : null;
-        this.timeStart = timeStart ? timeStart : null;
-        this.timeEnd = timeEnd ? timeEnd : null;
-        this.Status = Status ? Status : true;
+        this.dayOfWeek = dayOfWeek ? dayOfWeek : 0;
+        this.timeStart = timeStart ? timeStart : '08:00:00';
+        this.timeEnd = timeEnd ? timeEnd : '12:00:00';
+        this.status = status ? status : true;
     }
 }

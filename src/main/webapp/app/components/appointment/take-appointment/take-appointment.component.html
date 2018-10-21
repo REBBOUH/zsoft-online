@@ -1,0 +1,67 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+            <h2 jhiTranslate="appointment.managment.take.title">
+                Take an appointment
+            </h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+
+                <div class="form-group" [hidden]="!appointment.id">
+                    <label jhiTranslate="global.field.id">ID</label>
+                    <input type="text" class="form-control" name="id" [(ngModel)]="appointment.id" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="appointment.managment.doctor">Doctor</label>
+
+                    <select class="form-control" id="doctor" name="doctorId" [(ngModel)]="appointment.doctorId" (change)="setDoctor($event)" required>
+                        <option *ngFor="let doctor of doctors" [value]="doctor.id">
+                            Dr. {{doctor.userDTO.lastName | uppercase}} {{doctor.userDTO.firstName}}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group" *ngIf="appointment && appointment.doctor && appointment.doctor.id">
+                    <label class="form-control-label" jhiTranslate="appointment.managment.date">Date</label>
+                    <input type="date" class="form-control" name="date" #dateInput="ngModel"
+                           [(ngModel)]="appointment.date" required (change)="setDate($event)" min="{{minDate | date:'yyyy-MM-dd'}}">
+
+                    <div *ngIf="dateInput.dirty && dateInput.invalid">
+                        <small class="form-text text-danger"
+                               *ngIf="dateInput.errors.min" jhiTranslate="entity.validation.min"
+                               translateValues="{min: minDate}">
+                            This date cannot be before than {{minDate | date:'yyyy-MM-dd'}}.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group" *ngIf="availableAppointments && availableAppointments.length != 0">
+                    <label class="form-control-label" jhiTranslate="appointment.managment.timeStart">Time Start</label>
+
+                    <select class="form-control" id="timeStart" name="timeStart" [(ngModel)]="appointment.timeStart" (change)="setStartTime($event)" required>
+                        <option *ngFor="let ap of availableAppointments" [value]="ap.timeStart" [disabled]="ap.status=='Occuped'">{{ap.timeStart}}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" *ngIf="endTimes && endTimes.length != 0">
+                    <label class="form-control-label" jhiTranslate="appointment.managment.timeEnd">Time End</label>
+
+                    <select class="form-control" id="timeEnd" name="timeEnd" [(ngModel)]="appointment.timeEnd" required>
+                        <option *ngFor="let time of endTimes" [value]="time">{{time}}</option>
+                    </select>
+                </div>
+
+            </div>
+            <div>
+                <button type="button" class="btn btn-secondary" (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span
+                    jhiTranslate="entity.action.cancel">Cancel</span>
+                </button>
+                <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

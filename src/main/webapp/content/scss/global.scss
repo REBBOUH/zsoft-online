@@ -85,6 +85,11 @@ Generic styles
 
 .footer {
     border-top: 1px solid rgba(0, 0, 0, 0.125);
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px 5px;
+    background: rgba(0, 0, 0, 0.78);
+    color: #ffffff;
 }
 
 .hand,
@@ -224,3 +229,81 @@ ui bootstrap tweaks
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+
+/* ==========================================================================
+Navbar
+========================================================================== */
+
+.navbar-version {
+    background: #fdfb56;
+    border-radius: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 10px;
+    font-style: italic;
+    margin-left: -0.2rem;
+    padding: 0px 7px;
+    height: 14px;
+    line-height: 14px;
+    vertical-align: top;
+}
+
+.jh-navbar {
+    background-color: #fd5581;
+    background-image: linear-gradient(90deg, #fd5581, #fd8b55);
+    padding: 0.2em 1em;
+    box-shadow: inset 0px -1px 0px rgba(0, 0, 0, 0.2);
+    .profile-image {
+        margin: -10px 0px;
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
+    .dropdown-item {
+        font-size: 12px;
+        fa-icon {
+            margin-left: -0.75rem;
+            margin-right: 0.75rem;
+        }
+    }
+    .dropdown-item.active,
+    .dropdown-item.active:focus,
+    .dropdown-item.active:hover {
+        background-color: #fd5581;
+        background-image: linear-gradient(90deg, #fd5581, #fd8b55);
+        text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.35);
+        font-weight: bold;
+    }
+    .dropdown-toggle::after {
+        margin-left: 0.15em;
+    }
+    ul.navbar-nav {
+        padding: 0 0.5em;
+        .nav-item {
+            margin-left: 0.5rem;
+        }
+    }
+    a.nav-link {
+        font-weight: 400;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 1);
+        text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.35);
+        fa-icon {
+            margin-left: -0.5rem;
+            margin-right: 0.5rem;
+        }
+    }
+    .active {
+        a.nav-link {
+            color: #000;
+            font-weight: bold;
+        }
+    }
+    .jh-navbar-toggler {
+        color: #ccc;
+        font-size: 1.5em;
+        padding: 10px;
+        &:hover {
+            color: #fff;
+        }
+    }
+}

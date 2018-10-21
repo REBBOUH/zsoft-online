@@ -1,0 +1,18 @@
+<form name="cancelForm" (ngSubmit)="confirmCancel(appointment.id)">
+    <div class="modal-header">
+        <h4 class="modal-title" jhiTranslate="appointment.managment.cancel.title">Confirm cancel an Appointment</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <p jhiTranslate="appointment.managment.cancel.question">Are you sure you want to cancel this Appointment?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span jhiTranslate="appointment.actions.no">No</span>
+        </button>
+        <button type="submit" class="btn btn-danger">
+            <fa-icon [icon]="'times'"></fa-icon>&nbsp;<span jhiTranslate="appointment.actions.yes">Yes</span>
+        </button>
+    </div>
+</form>

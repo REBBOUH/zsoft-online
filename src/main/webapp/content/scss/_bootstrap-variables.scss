@@ -39,4 +39,10 @@ $body-bg: #e4e5e6;
 // Typography:
 // Font, line-height, and color for body text, headings, and more.
 
-$font-size-base: 1rem;
+$font-size-base: 0.75rem;
+$font-family-base: 'Open-Sans', 'Lato', Sans-Serif;
+$small-font-size: 90%;
+$headings-font-weight: 700;
+
+$dropdown-link-active-bg: #fd5581;
+$dropdown-link-active-color: #000000;

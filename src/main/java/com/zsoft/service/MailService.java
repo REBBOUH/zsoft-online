@@ -1,13 +1,8 @@
 package com.zsoft.service;
 
+import com.zsoft.domain.Appointment;
 import com.zsoft.domain.User;
-
 import io.github.jhipster.config.JHipsterProperties;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -17,6 +12,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 /**
  * Service for sending emails.
@@ -101,5 +101,26 @@ public class MailService {
     public void sendPasswordResetMail(User user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
+    }
+
+    @Async
+    public void sendReminderMail(Appointment appointment) {
+        log.debug("Sending an appointment reminder email to '{}'", appointment.getPatient().getEmail());
+        User patient = appointment.getPatient();
+        String templateName = "mail/reminderEmail";
+        String title = "email.reset.title";
+        Locale locale = Locale.forLanguageTag(patient.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable("patient", patient);
+        context.setVariable("doctor", appointment.getDoctor());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        context.setVariable("date", sdf.format(appointment.getDate()));
+        sdf = new SimpleDateFormat("HH:mm");
+        context.setVariable("timeStart", sdf.format(appointment.getTimeStart()));
+        context.setVariable("timeEnd", sdf.format(appointment.getTimeEnd()));
+        context.setVariable("baseUrl", jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        String subject = messageSource.getMessage(title, null, locale);
+        sendEmail(patient.getEmail(), subject, content, false, true);
     }
 }

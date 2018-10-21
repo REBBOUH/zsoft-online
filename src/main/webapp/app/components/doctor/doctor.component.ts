@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { JhiAlertService, JhiEventManager, JhiParseLinks } from 'ng-jhipster';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { Principal } from 'app/core';
@@ -35,9 +35,7 @@ export class DoctorComponent implements OnInit, OnDestroy {
         private principal: Principal,
         private parseLinks: JhiParseLinks,
         private activatedRoute: ActivatedRoute,
-        private router: Router,
-        private eventManager: JhiEventManager,
-        private modalService: NgbModal
+        private router: Router
     ) {
         this.itemsPerPage = ITEMS_PER_PAGE;
         this.routeData = this.activatedRoute.data.subscribe(data => {
@@ -49,7 +47,7 @@ export class DoctorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.principal.identity().then(doctorProfile => {
+        this.principal.identity().then(account => {
             this.loadAll();
         });
     }
@@ -91,7 +89,7 @@ export class DoctorComponent implements OnInit, OnDestroy {
     }
 
     transition() {
-        this.router.navigate(['/admin/doctors'], {
+        this.router.navigate(['/doctors'], {
             queryParams: {
                 page: this.page,
                 sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')

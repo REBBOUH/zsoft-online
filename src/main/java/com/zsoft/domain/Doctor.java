@@ -124,7 +124,6 @@ public class Doctor implements Serializable {
     public String toString() {
         return "Doctor{" +
             "id=" + id +
-            ", user=" + user.getId() +
             ", phone='" + phone + '\'' +
             ", address='" + address + '\'' +
             ", gender='" + gender + '\'' +

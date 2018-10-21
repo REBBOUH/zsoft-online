@@ -8,6 +8,7 @@ import com.zsoft.repository.AuthorityRepository;
 import com.zsoft.repository.DoctorRepository;
 import com.zsoft.repository.UserRepository;
 import com.zsoft.security.AuthoritiesConstants;
+import com.zsoft.service.AppointmentService;
 import io.github.jhipster.config.JHipsterConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -105,91 +106,5 @@ public class ZonlineApp {
             serverPort,
             contextPath,
             env.getActiveProfiles());
-    }
-
-    /*
-     */
-    //@Bean
-    ApplicationRunner init(DoctorRepository doctorRepository, UserRepository userRepository, AuthorityRepository authorityRepository){
-        return args -> {
-            System.out.println("\n\n##################################\n\n");
-            System.out.println("DOCTORS : ");
-            doctorRepository.findAll().forEach(System.out::println);
-            System.out.println("\n\n##################################\n\n");
-
-            if( !userRepository.findOneByLogin("doctor").isPresent() ){
-                System.out.println("Doctor User Not Exist");
-                User userDoctor = new User();
-                userDoctor.setEmail("doctor@localhost");
-                userDoctor.setLogin("doctor");
-                userDoctor.setActivated(true);
-                userDoctor.setPassword(RandomStringUtils.random(60));
-                userDoctor.setFirstName("john");
-                userDoctor.setLastName("doe");
-                userDoctor.setImageUrl("http://placehold.it/50x50");
-                userDoctor.setLangKey("en");
-                Set<Authority> authorities = new HashSet<>();
-                authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-                authorityRepository.findById(AuthoritiesConstants.DOCTOR).ifPresent(authorities::add);
-                userDoctor.setAuthorities(authorities);
-                userRepository.save(userDoctor);
-            }
-
-            User userDoctor = userRepository.findOneByLogin("doctor").get();
-            System.out.println(userDoctor);
-            if( doctorRepository.findDoctorByUser_Id(userDoctor.getId()).isPresent() ){
-                System.out.println("# Doctor Profile is already exsit :");
-                doctorRepository.deleteById(doctorRepository.findDoctorByUser_Id(userDoctor.getId()).get().getId());
-                System.out.println("# Delete Doctor !");
-            }
-            if( !doctorRepository.findDoctorByUser_Id(userDoctor.getId()).isPresent() ){
-
-                Set<Timeslot> timeslots = new HashSet<>();
-                timeslots.add(new Timeslot(0, Time.valueOf("08:00:00"), Time.valueOf("12:00:00"), true));
-                timeslots.add(new Timeslot(1, Time.valueOf("08:00:00"), Time.valueOf("11:30:00"), true));
-                timeslots.add(new Timeslot(2, Time.valueOf("08:00:00"), Time.valueOf("12:00:00"), true));
-                timeslots.add(new Timeslot(3, Time.valueOf("08:00:00"), Time.valueOf("12:00:00"), true));
-                timeslots.add(new Timeslot(4, Time.valueOf("08:00:00"), Time.valueOf("12:00:00"), true));
-                timeslots.add(new Timeslot(5, Time.valueOf("08:00:00"), Time.valueOf("12:00:00"), true));
-                System.out.println("TIME SLOTS : ");
-                timeslots.forEach(System.out::println);
-
-                Doctor doctor = new Doctor();
-                doctor.setPhone("001 131 213 266");
-                doctor.setAddress("NY , USA");
-                doctor.setGender("MALE");
-                doctor.setSpeciality("Médcin Générale");
-                doctor.setUser(userDoctor);
-                doctor.setTimeslots(timeslots);
-                System.out.println("# Created Doctor :");
-                System.out.println(doctor);
-                doctorRepository.saveAndFlush(doctor);
-            }
-
-            System.out.println("\n\n##################################\n\n");
-            System.out.println("DOCTORS : ");
-            doctorRepository.findAll().forEach(System.out::println);
-            System.out.println("\n\n##################################\n\n");
-        };
-    }
-
-    //@Bean
-    ApplicationRunner init(DoctorRepository doctorRepository, UserRepository userRepository, AuthorityRepository authorityRepository, AppointmentRepository appointmentRepository){
-        return args -> {
-            Doctor doctor = doctorRepository.findDoctorByUser_Id(userRepository.findOneByLogin("doctor").get().getId()).get();
-            User patient = userRepository.findOneByLogin("user").get();
-            Appointment appointment = new Appointment();
-            appointment.setDoctor(doctor);
-            appointment.setPatient(patient);
-            appointment.setDate(Date.valueOf("2018-10-17"));
-            appointment.setTimeStart(Time.valueOf("09:30:00"));
-            appointment.setTimeEnd(Time.valueOf("10:00:00"));
-            appointment.setStatus("FINISHED");
-            appointmentRepository.saveAndFlush(appointment);
-            System.out.println("\n\n##################################\n\n");
-            System.out.println("APPOINTMENTS : ");
-            appointmentRepository.findAll().forEach(System.out::println);
-            System.out.println("\n\n##################################\n\n");
-        };
     }
 }

@@ -19,8 +19,8 @@ public class Timeslot implements Serializable {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="day_week")
-    private int DayOfWeek;
+    @Column(name="day_week", length = 2)
+    private Integer dayOfWeek;
 
     @Column(name = "time_start")
     private Time timeStart;
@@ -28,8 +28,11 @@ public class Timeslot implements Serializable {
     @Column(name = "time_end")
     private Time timeEnd;
 
-    @Column(name = "status", columnDefinition="tinyint(1) default 1")
-    private Boolean Status;
+    @Column(name = "status", columnDefinition = "tinyint", length = 1)
+    private boolean status;
+
+    @Column(name = "doctor_id")
+    private Long doctorId;
 
     public Long getId() {
         return id;
@@ -39,12 +42,12 @@ public class Timeslot implements Serializable {
         this.id = id;
     }
 
-    public int getDayOfWeek() {
-        return DayOfWeek;
+    public Integer getDayOfWeek() {
+        return dayOfWeek;
     }
 
-    public void setDayOfWeek(int dayOfWeek) {
-        DayOfWeek = dayOfWeek;
+    public void setDayOfWeek(Integer dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
     }
 
     public Time getTimeStart() {
@@ -63,33 +66,42 @@ public class Timeslot implements Serializable {
         this.timeEnd = timeEnd;
     }
 
-    public Boolean getStatus() {
-        return Status;
+    public boolean getStatus() {
+        return status;
     }
 
-    public void setStatus(Boolean status) {
-        Status = status;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
 
     public Timeslot() {
     }
 
-    public Timeslot(int dayOfWeek, Time timeStart, Time timeEnd, Boolean status) {
-        DayOfWeek = dayOfWeek;
+    public Timeslot(Integer dayOfWeek, Time timeStart, Time timeEnd, boolean status, Long doctorId) {
+        this.dayOfWeek = dayOfWeek;
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
-        Status = status;
+        this.status = status;
+        this.doctorId = doctorId;
     }
 
     @Override
     public String toString() {
         return "Timeslot{" +
             "id=" + id +
-            ", DayOfWeek=" + DayOfWeek +
+            ", dayOfWeek=" + dayOfWeek +
             ", timeStart=" + timeStart +
             ", timeEnd=" + timeEnd +
-            ", Status=" + Status +
+            ", status=" + status +
+            ", doctorId=" + doctorId +
             '}';
     }
 }

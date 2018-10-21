@@ -1,6 +1,6 @@
 <div>
     <h2>
-        <span id="doctor-management-page-heading" jhiTranslate="doctorManagment.home.title">Doctors</span>
+        <span id="doctor-management-page-heading" jhiTranslate="doctor.managment.home.title">Doctors</span>
     </h2>
     <jhi-alert></jhi-alert>
     <div class="table-responsive" *ngIf="doctors">
@@ -8,17 +8,17 @@
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
                 <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th jhiSortBy="phone"><span jhiTranslate="doctorManagment.phone">Phone</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th jhiSortBy="email"><span jhiTranslate="doctorManagment.email">Email</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th></th>
-                <th></th>
+                <th jhiSortBy="name"><span jhiTranslate="doctor.managment.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="phone"><span jhiTranslate="doctor.managment.phone">Phone</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="userDTO.email"><span jhiTranslate="doctor.managment.email">Email</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             </tr>
             </thead>
             <tbody *ngIf ="doctors">
             <tr *ngFor="let doctor of doctors; trackBy: trackIdentity">
-                <td><a [routerLink]="['./', doctor.id, 'view']">{{doctor.id}}</a></td>
+                <td><a [routerLink]="['/doctor/', doctor.id, 'profile']">{{doctor.id}}</a></td>
+                <td>Dr.{{doctor.userDTO.lastName | uppercase}} {{doctor.userDTO.firstName}}</td>
                 <td>{{doctor.phone}}</td>
-                <td>{{doctor.user.email}}</td>
+                <td>{{doctor.userDTO.email}}</td>
             </tr>
             </tbody>
         </table>

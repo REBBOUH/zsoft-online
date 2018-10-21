@@ -1,0 +1,57 @@
+{
+    "appointment": {
+        "managment": {
+            "home": {
+                "title": "Tous les Rendez-vous"
+            },
+            "myappointments": {
+                "title": "Mes Rendez-vous"
+            },
+            "myappointmentsasdoctor": {
+                "title": "Mes Rendez-vous tq Médecin"
+            },
+            "view": {
+                "title": "Rendez-vous"
+            },
+            "update": {
+                "title": "Mettre à jour un rendez-vous"
+            },
+            "take": {
+                "takeAppointment": "Prendre rendez-vous"
+            },
+            "cancel": {
+                "title": "Confirmer: Annuler un rendez-vous",
+                "question": "Êtes-vous sûr de vouloir annuler ce rendez-vous?"
+            },
+            "doctor": "Médecin",
+            "patient": "Patient",
+            "date": "Date",
+            "time": "Temps",
+            "status": "Statut",
+            "timeStart": "Heure de début",
+            "timeEnd": "Heure de fin",
+            "panding": "En attendant",
+            "canceled": "Annulé",
+            "passed": "Passé"
+        },
+        "messages": {
+            "created": "Un nouveau rendez-vous est créé à la date {{ param }}",
+            "updated": "Un rendez-vous est modfiée avec l'identifiant {{ param }}",
+            "canceled": "Un rendez-vous est annulée avec l'identifiant {{ param }}"
+        },
+        "menu": {
+            "main": "Rendez-vous",
+            "take": "Prendre rendez-vous",
+            "myappointments": "Mes Rendez-vous",
+            "myappointmentsasdoctor": "Mes Rendez-vous tq Médecin",
+            "allappointments": "Tous les Rendez-vous"
+        },
+        "actions": {
+            "update": "Modifier",
+            "cancel": "Annuler",
+            "yes": "Oui",
+            "no": "Non",
+            "ok": "Ok"
+        }
+    }
+}

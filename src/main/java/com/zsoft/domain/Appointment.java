@@ -107,6 +107,16 @@ public class Appointment implements Serializable {
         this.status = status;
     }
 
+    public boolean isBetween(Time timeStart, Time timeEnd) {
+        if( this.timeStart.equals(timeStart) || (this.timeStart.after(timeStart) && this.timeStart.before(timeEnd)) ){
+            return true;
+        }
+        else if( this.timeEnd.equals(timeEnd) || (this.timeEnd.after(timeStart) && this.timeEnd.before(timeEnd)) ){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Appointment{" +

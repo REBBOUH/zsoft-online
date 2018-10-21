@@ -18,6 +18,56 @@
                     </span>
                 </a>
             </li>
+
+            <!-- New SUB NAVIGATIONS -->
+            <li *ngSwitchCase="true" ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="appointments-menu">
+                    <span>
+                        <fa-icon [icon]="'th-list'"></fa-icon>
+                        <span jhiTranslate="appointment.menu.main">
+                            Appointments
+                        </span>
+                    </span>
+                </a>
+                <ul class="dropdown-menu" ngbDropdownMenu>
+                    <li *jhiHasAnyAuthority="'ROLE_USER'">
+                        <a class="dropdown-item" routerLink="appointment/take" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon [icon]="'plus'" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="appointment.menu.take">Take Appointment</span>
+                        </a>
+                    </li>
+                    <li *jhiHasAnyAuthority="'ROLE_USER'">
+                        <a class="dropdown-item" routerLink="my-appointments" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon [icon]="'th-list'" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="appointment.menu.myappointments">My Appointments</span>
+                        </a>
+                    </li>
+                    <hr *jhiHasAnyAuthority="'ROLE_DOCTOR'">
+                    <li *jhiHasAnyAuthority="'ROLE_DOCTOR'">
+                        <a class="dropdown-item" routerLink="doctor/appointments" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon [icon]="'th-list'" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="appointment.menu.myappointmentsasdoctor">My Appointments as Doctor</span>
+                        </a>
+                    </li>
+                    <hr *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                    <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                        <a class="dropdown-item" routerLink="appointments" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon [icon]="'th-list'" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="appointment.menu.allappointments">All Appointments</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item" routerLinkActive="active" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                <a class="nav-link" routerLink="doctors" (click)="collapseNavbar()">
+                    <span>
+                        <fa-icon [icon]="'th-list'" [fixedWidth]="true"></fa-icon>
+                        <span jhiTranslate="doctor.menu.alldoctors">All Doctors</span>
+                    </span>
+                </a>
+            </li>
+            <!-- /New SUB NAVIGATIONS -->
+
             <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
             <li *ngSwitchCase="true" ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
@@ -123,6 +173,14 @@
                   </span>
                 </a>
                 <ul class="dropdown-menu" ngbDropdownMenu>
+                    <!-- New SUB NAVIGATIONS -->
+                    <li *jhiHasAnyAuthority="'ROLE_DOCTOR'">
+                        <a class="dropdown-item" routerLink="doctor/my-profile" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon [icon]="'user'" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="doctor.menu.mydoctorprofile">My Doctor Profile</span>
+                        </a>
+                    </li>
+                    <!-- /New SUB NAVIGATIONS -->
                     <li *ngSwitchCase="true">
                         <a class="dropdown-item" routerLink="settings" routerLinkActive="active" (click)="collapseNavbar()">
                             <fa-icon [icon]="'wrench'" [fixedWidth]="true"></fa-icon>

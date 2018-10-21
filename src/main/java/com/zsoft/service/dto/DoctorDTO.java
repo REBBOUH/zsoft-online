@@ -2,6 +2,7 @@ package com.zsoft.service.dto;
 
 import com.zsoft.domain.Doctor;
 import com.zsoft.domain.Timeslot;
+import com.zsoft.domain.User;
 
 import javax.validation.constraints.Size;
 import java.util.HashSet;
@@ -24,7 +25,9 @@ public class DoctorDTO {
 
     private Long userId;
 
-    private Set<Timeslot> timeslots;
+    private User userDTO;
+
+    private Set<TimeslotDTO> timeslots;
 
     public DoctorDTO() {
     }
@@ -33,13 +36,17 @@ public class DoctorDTO {
         this.id = doctor.getId();
         this.phone = doctor.getPhone();
         this.address = doctor.getAddress();
-        this.gender = doctor.getGender().toString();
+        if( doctor.getGender() != null )
+            this.gender = doctor.getGender().toString();
         this.speciality = doctor.getSpeciality();
-        this.userId = doctor.getUser().getId();
+        if( doctor.getUser() != null )
+            this.userId = doctor.getUser().getId();
+        this.userDTO = doctor.getUser();
         this.timeslots = new HashSet<>();
-        for (Timeslot timeslot: doctor.getTimeslots()) {
-            this.timeslots.add(timeslot);
-        }
+        if( doctor.getTimeslots() != null )
+            for (Timeslot timeslot: doctor.getTimeslots()) {
+                this.timeslots.add(new TimeslotDTO(timeslot));
+            }
     }
 
     public Long getId() {
@@ -90,11 +97,19 @@ public class DoctorDTO {
         this.userId = userId;
     }
 
-    public Set<Timeslot> getTimeslots() {
+    public User getUserDTO() {
+        return userDTO;
+    }
+
+    public void setUserDTO(User userDTO) {
+        this.userDTO = userDTO;
+    }
+
+    public Set<TimeslotDTO> getTimeslots() {
         return timeslots;
     }
 
-    public void setTimeslots(Set<Timeslot> timeslots) {
+    public void setTimeslots(Set<TimeslotDTO> timeslots) {
         this.timeslots = timeslots;
     }
 
@@ -106,7 +121,8 @@ public class DoctorDTO {
             ", address='" + address + '\'' +
             ", gender='" + gender + '\'' +
             ", speciality='" + speciality + '\'' +
-            ", userDTO=" + userId +
+            ", userId=" + userId +
+            ", userDTO=" + userDTO +
             '}';
     }
 }

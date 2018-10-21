@@ -39,7 +39,9 @@ import {
     faTrashAlt,
     faAsterisk,
     faTasks,
-    faHome
+    faHome,
+    faMinus,
+    faTrash
 } from '@fortawesome/free-solid-svg-icons';
 
 // Adds the SVG icon to the library so you can use it in your page
@@ -54,6 +56,9 @@ library.add(faTimes);
 library.add(faArrowLeft);
 library.add(faSave);
 library.add(faPlus);
+library.add(faMinus);
+library.add(faTrash);
+library.add(faTrashAlt);
 library.add(faPencilAlt);
 library.add(faBars);
 library.add(faHome);

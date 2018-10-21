@@ -1,6 +1,8 @@
 package com.zsoft.service.dto;
 
 import com.zsoft.domain.Appointment;
+import com.zsoft.domain.Doctor;
+import com.zsoft.domain.User;
 
 import javax.validation.constraints.Size;
 import java.sql.Date;
@@ -9,9 +11,9 @@ import java.sql.Time;
 public class AppointmentDTO {
     private Long id;
 
-    private Long doctorId;
+    private Doctor doctor;
 
-    private Long patientId;
+    private User patient;
 
     private Date date;
 
@@ -28,11 +30,13 @@ public class AppointmentDTO {
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
         this.date = appointment.getDate();
-        this.timeStart = appointment.getTimeStart().toString();
-        this.timeEnd = appointment.getTimeEnd().toString();
+        if( appointment.getTimeStart() != null )
+            this.timeStart = appointment.getTimeStart().toString();
+        if( appointment.getTimeEnd() != null )
+            this.timeEnd = appointment.getTimeEnd().toString();
         this.status = appointment.getStatus();
-        this.doctorId = appointment.getDoctor().getId();
-        this.patientId = appointment.getPatient().getId();
+        this.doctor = appointment.getDoctor();
+        this.patient = appointment.getPatient();
     }
 
     public Long getId() {
@@ -43,20 +47,20 @@ public class AppointmentDTO {
         this.id = id;
     }
 
-    public Long getDoctorId() {
-        return doctorId;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
-    public Long getPatientId() {
-        return patientId;
+    public User getPatient() {
+        return patient;
     }
 
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
+    public void setPatient(User patient) {
+        this.patient = patient;
     }
 
     public Date getDate() {
@@ -95,8 +99,8 @@ public class AppointmentDTO {
     public String toString() {
         return "AppointmentDTO{" +
             "id=" + id +
-            ", doctorId=" + doctorId +
-            ", patientId=" + patientId +
+            ", doctor=" + doctor +
+            ", patient=" + patient +
             ", date=" + date +
             ", timeStart=" + timeStart +
             ", timeEnd=" + timeEnd +

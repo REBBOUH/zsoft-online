@@ -1,10 +1,10 @@
 <p>
   profile works!
 </p>
-<div class="row justify-content-center">
+<div class="row justify-content-center" *ngIf="doctor">
     <div class="col-8">
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
-            <h2 id="myDoctorLabel" jhiTranslate="doctorManagement.home.createOrEditLabel">
+            <h2 id="myDoctorLabel" jhiTranslate="doctor.managment.home.createOrEditLabel">
                 Create or edit a Doctor Profile
             </h2>
             <div>
@@ -16,18 +16,26 @@
                            [(ngModel)]="doctor.id" readonly>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.speciality">Speciality</label>
+                    <input type="text" class="form-control" name="speciality" #specialityInput="ngModel"
+                           [(ngModel)]="doctor.speciality" maxlength="50">
+
+                    <div *ngIf="specialityInput.dirty && specialityInput.invalid">
+                        <small class="form-text text-danger"
+                               *ngIf="specialityInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
+                               translateValues="{max: 50}">
+                            This field cannot be longer than 50 characters.
+                        </small>
+                    </div>
+                </div>
 
                 <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="doctorManagement.phone">Phone</label>
+                    <label class="form-control-label" jhiTranslate="doctor.managment.phone">Phone</label>
                     <input type="text" class="form-control" name="phone" #phoneInput="ngModel"
-                           [(ngModel)]="doctor.phone" required minlength="1" maxlength="50">
+                           [(ngModel)]="doctor.phone" maxlength="50">
 
                     <div *ngIf="phoneInput.dirty && phoneInput.invalid">
-                        <small class="form-text text-danger"
-                               *ngIf="phoneInput.errors.required" jhiTranslate="entity.validation.required">
-                            This field is required.
-                        </small>
-
                         <small class="form-text text-danger"
                                *ngIf="phoneInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
                                translateValues="{max: 50}">
@@ -37,44 +45,73 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="doctorManagement.address">Address</label>
+                    <label class="form-control-label" jhiTranslate="doctor.managment.address">Address</label>
                     <input type="text" class="form-control" name="address" #addressInput="ngModel"
-                           [(ngModel)]="doctor.address" maxlength="50">
+                           [(ngModel)]="doctor.address" maxlength="254">
 
                     <div *ngIf="addressInput.dirty && addressInput.invalid">
                         <small class="form-text text-danger"
                                *ngIf="addressInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
-                               translateValues="{max: 50}">
-                            This field cannot be longer than 50 characters.
+                               translateValues="{max: 254}">
+                            This field cannot be longer than 254 characters.
                         </small>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label jhiTranslate="doctorManagement.Gender">Gender</label>
+                    <label jhiTranslate="doctor.managment.gender">Gender</label>
                     <select class="form-control" id="gender" name="gender" [(ngModel)]="doctor.gender">
-                        <option [value]="MALE" >Male</option>
-                        <option [value]="FEMALE" >Female</option>
+                        <option value="MALE" >Male</option>
+                        <option value="FEMALE" >Female</option>
                     </select>
                 </div>
 
-                <div class="form-group"  *ngIf="timeSlots && timeSlots.length > 0">
-                    <label class="form-control-label" jhiTranslate="doctorManagement.timeslots">TimeSlots</label>
-                    <div class="row" *ngFor="let timeslot of timeSlots">
-                        <input type="hidden" name="status" [(ngModel)]="timeslot.Status">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" name="DayOfWeek" #addressInput="ngModel"
-                                   [(ngModel)]="timeslot.DayOfWeek" >
-                        </div>
-                        <div class="col-md-4">
-                            <input type="time" class="form-control" name="timeStart" #addressInput="ngModel"
-                                   [(ngModel)]="timeslot.timeStart" >
-                        </div>
-                        <div class="col-md-4">
-                            <input type="time" class="form-control" name="timeEnd" #addressInput="ngModel"
-                                   [(ngModel)]="timeslot.timeEnd" >
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.timeslots">Time Slots</label>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th jhiTranslate="doctor.managment.day">Day</th>
+                                <th jhiTranslate="doctor.managment.timeStart">Start time</th>
+                                <th jhiTranslate="doctor.managment.timeEnd">End time</th>
+                                <th jhiTranslate="doctor.actions.remove">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="doctor.timeslots">
+                            <tr *ngFor="let timeslot of doctor.timeslots">
+                                <td>
+                                    <select class="form-control" id="dayOfWeek-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][dayOfWeek]" [(ngModel)]="timeslot.dayOfWeek">
+                                        <option *ngFor="let day of days" [value]="days.indexOf(day)">{{day}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control" id="timeStart-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][timeStart]" [(ngModel)]="timeslot.timeStart">
+                                        <option *ngFor="let time of times" [value]="time">{{time}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control" id="timeEnd-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][timeEnd]" [(ngModel)]="timeslot.timeEnd">
+                                        <option *ngFor="let time of times" [value]="time">{{time}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="removeTimeSlot(timeslot)">
+                                        <fa-icon [icon]="'trash-alt'"></fa-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                               <td colspan="5">
+                                   <button type="button" class="btn btn-block" (click)="addTimeSlot()">
+                                       <fa-icon [icon]="'plus'"></fa-icon>&nbsp;<span
+                                       jhiTranslate="doctor.actions.add">Add</span>
+                                   </button>
+                               </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
 
             </div>
