@@ -1,5 +1,6 @@
 package com.zsoft.service;
 
+import com.google.common.collect.Lists;
 import com.zsoft.config.Constants;
 import com.zsoft.domain.Appointment;
 import com.zsoft.domain.Doctor;
@@ -27,6 +28,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -124,9 +126,10 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDTO> getAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDoctor_IdAndDate(doctor_id, date);
-        return appointments.stream().map(AppointmentDTO::new).collect(Collectors.toList());
+    public Stream<AppointmentDTO> getAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
+        return appointmentRepository
+            .findAppointmentsByDoctor_IdAndDate(doctor_id, date)
+            .map(AppointmentDTO::new);
     }
 
     @Transactional(readOnly = true)
@@ -138,29 +141,21 @@ public class AppointmentService {
         List<Timeslot> timeslots = timeslotRepository.findTimeslotsByDoctorIdAndDayOfWeek(doctor_id, dayOfWeek);
         // Get appointments of this date and this doctor
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDoctor_IdAndDateAndStatusNot(doctor_id, date, "Canceled");
-        List<Appointment> appointmentsAvailable = new ArrayList<>();
-        timeslots.forEach(
-            timeslot -> {
-                long fullTime = Duration.between(timeslot.getTimeStart().toLocalTime(), timeslot.getTimeEnd().toLocalTime()).toMinutes();
-                int nbrOfSlots = (int)(fullTime/ Constants.SLOT_LENGTH);
-                LocalTime time = timeslot.getTimeStart().toLocalTime();
-                for (int i = 0; i < nbrOfSlots; i++ ){
-                    Appointment appointment = new Appointment();
-                    appointment.setTimeStart(Time.valueOf(time));
-                    appointment.setTimeEnd(Time.valueOf(time.plusMinutes(Constants.SLOT_LENGTH)));
-                    for( Appointment ap: appointments) {
-                        if( !appointment.isBetween(ap.getTimeStart(), ap.getTimeEnd()) ){
-                            appointment.setStatus("Available");
-                        }else{
-                            appointment.setStatus("Occuped");
-                            break;
-                        }
-                    }
-                    appointmentsAvailable.add(appointment);
-                    time = time.plusMinutes(Constants.SLOT_LENGTH);
+
+        List<AppointmentDTO> appointmentsAvailable = timeslots
+            .stream()
+            .reduce(new ArrayList<Appointment>(),
+                (resultAppointments, currentTimeslot)->currentTimeslot.toAppointments(resultAppointments),
+                (a,b)-> a
+            ).stream()
+            .map(appointment ->{
+                if( appointment.isOccuped(appointments) ){
+                    appointment.setStatus("Occuped");
                 }
-            }
-        );
+                return appointment;
+            })
+            .map(AppointmentDTO::new)
+            .collect(Collectors.toList());
 
         // Fill the gaps (Set times between time slot)
         // Sort TimeSlot List By time start asc
@@ -172,15 +167,15 @@ public class AppointmentService {
             while( timeslotIterator.hasNext() ){
                 nts = timeslotIterator.next();
                 if( nts.getTimeStart().after(ts.getTimeEnd()) ) {
-                    appointmentsAvailable.add(new Appointment(null, null, null, ts.getTimeEnd(), nts.getTimeStart(), "Occuped"));
+                    appointmentsAvailable.add(new AppointmentDTO(ts.getTimeEnd().toString(), nts.getTimeStart().toString(), "Occuped"));
                 }
                 ts = nts;
             }
             // Sort Available Appointments By time start asc
-            appointmentsAvailable.sort((a1, a2) -> a1.getTimeStart().before(a2.getTimeStart())?-1:1);
+            appointmentsAvailable.sort((a1, a2) -> Time.valueOf(a1.getTimeStart()).before(Time.valueOf(a2.getTimeStart()))?-1:1);
         }
 
-        return appointmentsAvailable.stream().map(AppointmentDTO::new).collect(Collectors.toList());
+        return appointmentsAvailable;
     }
 
     public Optional<Appointment> find(Long appointment_id) {

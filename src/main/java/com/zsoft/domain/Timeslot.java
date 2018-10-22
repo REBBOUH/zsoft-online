@@ -2,12 +2,16 @@ package com.zsoft.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.zsoft.config.Constants;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "jhi_timeslot")
@@ -91,6 +95,21 @@ public class Timeslot implements Serializable {
         this.timeEnd = timeEnd;
         this.status = status;
         this.doctorId = doctorId;
+    }
+
+    public ArrayList<Appointment> toAppointments(ArrayList<Appointment> appointments){
+        long fullTime = Duration.between(timeStart.toLocalTime(), timeEnd.toLocalTime()).toMinutes();
+        int nbrOfSlots = (int)(fullTime/ Constants.SLOT_LENGTH);
+        LocalTime time = timeStart.toLocalTime();
+        for (int i = 0; i < nbrOfSlots; i++ ){
+            Appointment appointment = new Appointment();
+            appointment.setTimeStart(Time.valueOf(time));
+            appointment.setTimeEnd(Time.valueOf(time.plusMinutes(Constants.SLOT_LENGTH)));
+            appointment.setStatus("Available");
+            appointments.add(appointment);
+            time = time.plusMinutes(Constants.SLOT_LENGTH);
+        }
+        return appointments;
     }
 
     @Override

@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing appointments.
@@ -162,8 +164,9 @@ public class AppointmentResource {
     @GetMapping("/appointments/doctor/{doctor_id}/{date}")
     @Timed
     public List<AppointmentDTO> getAppointmentsOfDoctorByDate(@PathVariable Long doctor_id, @PathVariable Date date) {
-        final List<AppointmentDTO> appointments = appointmentService.getAppointmentsOfDoctorByDate(doctor_id, date);
-        return appointments;
+        return appointmentService
+            .getAppointmentsOfDoctorByDate(doctor_id, date)
+            .collect(Collectors.toList());
     }
 
     /**

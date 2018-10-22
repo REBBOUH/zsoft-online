@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -20,13 +21,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Page<Appointment> findAppointmentsByPatient_Id(Pageable pageable, Long patient_id);
 
-    List<Appointment> findAppointmentsByDoctor_IdAndDate(Long doctor_id, Date date);
+    Stream<Appointment> findAppointmentsByDoctor_IdAndDate(Long doctor_id, Date date);
 
     List<Appointment> findAppointmentsByDoctor_IdAndDateAndStatusNot(Long doctor_id, Date date, String status);
 
     Optional<Appointment> findAppointmentsById(Long appointment_id);
 
-    List<Appointment> findAppointmentsByDateBeforeAndStatus(Date date, String status);
+    Stream<Appointment> findAppointmentsByDateBeforeAndStatus(Date date, String status);
 
-    List<Appointment> findAppointmentsByDateAndStatus(Date date, String status);
+    Stream<Appointment> findAppointmentsByDateAndStatus(Date date, String status);
 }

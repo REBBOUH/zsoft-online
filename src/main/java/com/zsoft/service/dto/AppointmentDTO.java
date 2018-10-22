@@ -27,6 +27,12 @@ public class AppointmentDTO {
     public AppointmentDTO() {
     }
 
+    public AppointmentDTO(String timeStart, String timeEnd, @Size(max = 15) String status) {
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
+        this.status = status;
+    }
+
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
         this.date = appointment.getDate();

@@ -7,6 +7,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "jhi_appointment")
@@ -113,6 +115,15 @@ public class Appointment implements Serializable {
         }
         else if( this.timeEnd.equals(timeEnd) || (this.timeEnd.after(timeStart) && this.timeEnd.before(timeEnd)) ){
             return true;
+        }
+        return false;
+    }
+
+    public boolean isOccuped(List<Appointment> appointments){
+        for( Appointment ap: appointments) {
+            if( isBetween(ap.getTimeStart(), ap.getTimeEnd()) ){
+                return true;
+            }
         }
         return false;
     }
