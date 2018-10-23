@@ -1,13 +1,8 @@
 package com.zsoft.service.extension;
 
-import com.zsoft.domain.User;
 import com.zsoft.domain.extension.Appointment;
 import com.zsoft.domain.extension.AppointmentStatus;
-import com.zsoft.domain.extension.Doctor;
-import com.zsoft.repository.UserRepository;
 import com.zsoft.repository.extension.AppointmentRepository;
-import com.zsoft.repository.extension.DoctorRepository;
-import com.zsoft.service.MailService;
 import com.zsoft.service.dto.extension.AppointmentDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.sql.Time;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Calendar;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -29,48 +23,37 @@ public class AppointmentService {
 
     private final Logger log = LoggerFactory.getLogger(DoctorService.class);
 
-    private final DoctorRepository doctorRepository;
-
-    private final UserRepository userRepository;
-
     private final AppointmentRepository appointmentRepository;
 
-    private final MailService mailService;
+    private final AppointmentMailService mailService;
 
     public AppointmentService(
-        DoctorRepository doctorRepository,
-        UserRepository userRepository,
         AppointmentRepository appointmentRepository,
-        MailService mailService
+        AppointmentMailService mailService
     ) {
-        this.doctorRepository = doctorRepository;
-        this.userRepository = userRepository;
         this.appointmentRepository = appointmentRepository;
         this.mailService = mailService;
     }
 
-    public Optional<Appointment> takeAppointment(AppointmentDTO appointmentDTO) {
-        return Optional.of(appointmentRepository.findById(appointmentDTO.getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+    public Appointment takeAppointment(AppointmentDTO appointmentDTO) {
+        return appointmentRepository
+            .findById(appointmentDTO.getId())
             .map(appointment -> {
                 appointment.setPatient(appointmentDTO.getPatient());
                 appointment.setStatus(AppointmentStatus.PENDING);
                 log.debug("Update Information for Appointment : {}", appointment);
-                appointmentRepository.saveAndFlush(appointment);
-                return appointment;
-            });
+                return appointmentRepository.saveAndFlush(appointment);
+            })
+            .orElseThrow(() -> new IllegalArgumentException("Illegal Arguments, Appointment not found !"));
     }
 
-    public Optional<Appointment> updateAppointment(AppointmentDTO appointmentDTO, Long old_appointment_id) {
+    public Appointment updateAppointment(AppointmentDTO appointmentDTO, Long old_appointment_id) {
         this.cancelAppointment(old_appointment_id);
         return this.takeAppointment(appointmentDTO);
     }
 
     public void cancelAppointment(Long id) {
-        Optional.of(appointmentRepository.findById(id))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+        appointmentRepository.findById(id)
             .map(appointment -> {
                 // Change status to CANCELED
                 appointment.setStatus(AppointmentStatus.CANCELED);
@@ -86,37 +69,35 @@ public class AppointmentService {
                 appointmentRepository.save(copyAppointment);
                 log.debug("Cancel an Appointment: {}", appointment);
                 return appointment;
-            });
+            })
+            .orElseThrow(() -> new IllegalArgumentException("Illegal Arguments, Appointment not found !"));
     }
 
     @Transactional(readOnly = true)
-    public Page<AppointmentDTO> getAllAppointment(Pageable pageable) {
-        return appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
+    public Page<Appointment> getAllAppointment(Pageable pageable) {
+        return appointmentRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
-    public Page<AppointmentDTO> getAllAppointmentOfDoctor(Pageable pageable, Long doctor_user_id) {
-        return appointmentRepository.findAppointmentsByDoctor_User_Id(pageable, doctor_user_id).map(AppointmentDTO::new);
+    public Page<Appointment> getAllAppointmentOfDoctor(Pageable pageable, Long doctor_user_id) {
+        return appointmentRepository.findAppointmentsByDoctor_User_Id(pageable, doctor_user_id);
     }
 
     @Transactional(readOnly = true)
-    public Page<AppointmentDTO> getAllAppointmentOfPatient(Pageable pageable, Long patient_id) {
-        return appointmentRepository.findAppointmentsByPatient_Id(pageable, patient_id).map(AppointmentDTO::new);
+    public Page<Appointment> getAllAppointmentOfPatient(Pageable pageable, Long patient_id) {
+        return appointmentRepository.findAppointmentsByPatient_Id(pageable, patient_id);
     }
 
     @Transactional(readOnly = true)
-    public Stream<AppointmentDTO> getAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
+    public Stream<Appointment> getAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
         return appointmentRepository
-            .findAppointmentsByDoctor_IdAndDateAndStatusNot(doctor_id, date, AppointmentStatus.FREE)
-            .map(AppointmentDTO::new);
+            .findAppointmentsByDoctor_IdAndDateAndStatusNot(doctor_id, date, AppointmentStatus.FREE);
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDTO> getAvailableAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
+    public Stream<Appointment> getAvailableAppointmentsOfDoctorByDate(Long doctor_id, Date date) {
         return appointmentRepository
-            .findAppointmentsByDoctor_IdAndDateAndStatus(doctor_id, date, AppointmentStatus.FREE)
-            .map(AppointmentDTO::new)
-            .collect(Collectors.toList());
+            .findAppointmentsByDoctor_IdAndDateAndStatus(doctor_id, date, AppointmentStatus.FREE);
     }
 
     public Optional<Appointment> find(Long appointment_id) {
@@ -130,6 +111,7 @@ public class AppointmentService {
     public void appointmentScheduled(){
         changeAppointmentsStatus();
         createNewAppointments();
+        sendReminderAppointmentsEmails();
     }
 
     private void changeAppointmentsStatus(){
@@ -144,6 +126,13 @@ public class AppointmentService {
                     log.debug("Passed an Appointment: {}", appointment);
                     appointmentRepository.saveAndFlush(appointment);
                 });
+    }
+
+    private void sendReminderAppointmentsEmails(){
+        Date today = new Date(Calendar.getInstance().getTime().getTime());
+        appointmentRepository
+            .findAppointmentsByDateAndStatus(today, AppointmentStatus.PENDING)
+            .forEach(mailService::sendReminderMail);
     }
 
     // create free appointments for each doctor

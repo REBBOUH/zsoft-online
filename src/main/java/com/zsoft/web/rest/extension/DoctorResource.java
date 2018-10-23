@@ -55,13 +55,12 @@ public class DoctorResource {
      */
     @PostMapping("/doctors")
     @Timed
-    public ResponseEntity<DoctorDTO> createDoctorProfile(@Valid @RequestBody DoctorDTO doctorDTO) throws URISyntaxException {
-        log.debug("REST request to save Doctor : {}", doctorDTO);
-
+    public ResponseEntity<Doctor> createDoctorProfile(@Valid @RequestBody DoctorDTO doctorDTO) throws URISyntaxException {
+        log.debug("REST request to create a new Doctor Profile : {}", doctorDTO);
         if (doctorDTO.getId() != null || doctorRepository.findDoctorByUser_Id(doctorDTO.getUserId()).isPresent()) {
-            throw new BadRequestAlertException("A new doctor profile cannot already have an ID", "doctor.messages", "idexists");
+            throw new BadRequestAlertException("Doctor profile Already exist !", "doctor.messages", "idexists");
         } else {
-            DoctorDTO newDoctor = doctorService.createDoctorProfile(doctorDTO);
+            Doctor newDoctor = doctorService.createDoctorProfile(doctorDTO);
             return ResponseEntity.created(new URI("/api/doctors/profile"))
                 .headers(HeaderUtil.createAlert("doctor.messages.created", newDoctor.getId().toString()))
                 .body(newDoctor);
@@ -79,9 +78,13 @@ public class DoctorResource {
     @Timed
     public ResponseEntity<DoctorDTO> updateDoctorProfile(@Valid @RequestBody DoctorDTO doctorDTO) {
         log.debug("REST request to update Doctor Profile : {}", doctorDTO);
-        Optional<DoctorDTO> updatedDoctor = doctorService.updateDoctor(doctorDTO);
-        return ResponseUtil.wrapOrNotFound(updatedDoctor,
-            HeaderUtil.createAlert("doctor.messages.updated", doctorDTO.getId().toString()));
+        if ( doctorDTO.getId() == null || !doctorRepository.findById(doctorDTO.getId()).isPresent()) {
+            throw new BadRequestAlertException("Doctor profile not found", "doctor.messages", "notexist");
+        } else {
+            Optional<DoctorDTO> updatedDoctor = doctorService.updateDoctor(doctorDTO);
+            return ResponseUtil.wrapOrNotFound(updatedDoctor,
+                HeaderUtil.createAlert("doctor.messages.updated", doctorDTO.getId().toString()));
+        }
     }
 
     /**
@@ -121,12 +124,6 @@ public class DoctorResource {
     @Timed
     public ResponseEntity<DoctorDTO> findDoctorProfileByUserId(@PathVariable Long user_id) {
         log.debug("REST request to get Doctor Profile : {}", user_id);
-        DoctorDTO doctorDTO;
-        try{
-            doctorDTO = new DoctorDTO(doctorService.findByUserId(user_id).get());
-        }catch (Exception ex){
-            doctorDTO = new DoctorDTO();
-        }
-        return ResponseUtil.wrapOrNotFound(Optional.of(doctorDTO));
+        return ResponseUtil.wrapOrNotFound(doctorService.findByUserId(user_id).map(DoctorDTO::new));
     }
 }

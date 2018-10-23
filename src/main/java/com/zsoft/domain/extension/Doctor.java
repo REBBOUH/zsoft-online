@@ -32,6 +32,7 @@ public class Doctor implements Serializable {
     @Column(length = 254)
     private String address;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 10)
     private Gender gender;
 

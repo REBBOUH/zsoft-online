@@ -25,19 +25,6 @@ public class AppointmentDTO {
     @Size(max = 15)
     private String status;
 
-    public AppointmentDTO() {
-    }
-
-    public AppointmentDTO(Long id, Doctor doctor, User patient, Date date, Time timeStart, Time timeEnd, @Size(max = 15) String status) {
-        this.id = id;
-        this.doctor = doctor;
-        this.patient = patient;
-        this.date = date;
-        this.timeStart = timeStart;
-        this.timeEnd = timeEnd;
-        this.status = status;
-    }
-
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
         this.doctor = appointment.getDoctor();
@@ -50,13 +37,13 @@ public class AppointmentDTO {
 
     public Appointment toAppointment() {
         Appointment ap = new Appointment();
-        ap.setId(this.id);
-        ap.setDoctor(this.doctor);
-        ap.setPatient(this.patient);
-        ap.setDate(this.date);
-        ap.setTimeStart(this.timeStart);
-        ap.setTimeEnd(this.timeEnd);
-        ap.setStatus(AppointmentStatus.valueOf(this.status));
+        ap.setId(this.getId());
+        ap.setDoctor(this.getDoctor());
+        ap.setPatient(this.getPatient());
+        ap.setDate(this.getDate());
+        ap.setTimeStart(this.getTimeStart());
+        ap.setTimeEnd(this.getTimeEnd());
+        ap.setStatus(AppointmentStatus.valueOf(this.getStatus()));
         return ap;
     }
 

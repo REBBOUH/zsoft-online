@@ -1,12 +1,8 @@
 package com.zsoft.service.extension;
 
-import com.zsoft.domain.User;
-import com.zsoft.domain.extension.Appointment;
 import com.zsoft.domain.extension.Doctor;
-import com.zsoft.domain.extension.Gender;
 import com.zsoft.repository.UserRepository;
 import com.zsoft.repository.extension.DoctorRepository;
-import com.zsoft.service.dto.extension.AppointmentDTO;
 import com.zsoft.service.dto.extension.DoctorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -43,26 +37,12 @@ public class DoctorService {
      * @param doctorDTO doctor profile to update
      * @return created doctor profile
      */
-    public DoctorDTO createDoctorProfile(DoctorDTO doctorDTO) {
-        Doctor doctor = new Doctor();
-        // set Profile informations
-        doctor.setPhone(doctorDTO.getPhone());
-        doctor.setAddress(doctorDTO.getAddress());
-        doctor.setGender(Gender.valueOf(doctorDTO.getGender()));
-        doctor.setSpeciality(doctorDTO.getSpeciality());
-        // set profile user
-        User user = userRepository.findById(doctorDTO.getUserId()).get();
-        doctor.setUser(user);
-        // create appointments
-        Set<Appointment> appointments = new HashSet<>();
-        for (AppointmentDTO appointment: doctorDTO.getAppointments()) {
-            appointments.add(appointment.toAppointment());
+    public Doctor createDoctorProfile(DoctorDTO doctorDTO) {
+        if( !userRepository.findById(doctorDTO.getUserId()).isPresent() ){
+            throw new IllegalArgumentException("Illegal Arguments, User Not Found !");
         }
-        doctor.setAppointments(appointments);
-        // save the new profile
-        doctorRepository.saveAndFlush(doctor);
-        log.debug("Created Information for Doctor Profile : {}", doctor);
-        return new DoctorDTO(doctor);
+        log.debug("Created Information for Doctor Profile : {}", doctorDTO);
+        return doctorRepository.saveAndFlush(doctorDTO.toDoctor());
     }
 
     /**
@@ -72,25 +52,13 @@ public class DoctorService {
      * @return updated doctor profile
      */
     public Optional<DoctorDTO> updateDoctor(DoctorDTO doctorDTO) {
-        return Optional.of(doctorRepository
-            .findById(doctorDTO.getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+        if( !userRepository.findById(doctorDTO.getUserId()).isPresent() ){
+            throw new IllegalArgumentException("Illegal Arguments, User Not Found !");
+        }
+        return doctorRepository.findById(doctorDTO.getId())
             .map(doctor -> {
-                // set Profile informations
-                doctor.setPhone(doctorDTO.getPhone());
-                doctor.setAddress(doctorDTO.getAddress());
-                doctor.setGender(Gender.valueOf(doctorDTO.getGender()));
-                doctor.setSpeciality(doctorDTO.getSpeciality());
-                // create appointments
-                Set<Appointment> appointments = new HashSet<>();
-                for (AppointmentDTO appointment: doctorDTO.getAppointments()) {
-                    appointments.add(appointment.toAppointment());
-                }
-                doctor.setAppointments(appointments);
-                // save the profile
-                log.debug("Changed Information for Doctor Profile: {}", doctor);
-                return doctor;
+                log.debug("Changed Information for Doctor Profile: {}", doctorDTO);
+                return doctorRepository.saveAndFlush(doctorDTO.toDoctor(doctor));
             })
             .map(DoctorDTO::new);
     }

@@ -24,7 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +41,7 @@ public class AppointmentResource {
     }
 
     /**
-     * POST  /appointments  : Creates a new Appointment.
+     * POST  /appointments  : Create a new Appointment.
      * <p>
      * Creates a new appointment if the user has ROLE_PATIENT
      *
@@ -56,14 +55,14 @@ public class AppointmentResource {
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
     public ResponseEntity<Appointment> takeAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) throws URISyntaxException {
         log.debug("REST request to save Appointment : {}", appointmentDTO);
-        Appointment newAppointment = appointmentService.takeAppointment(appointmentDTO).get();
+        Appointment newAppointment = appointmentService.takeAppointment(appointmentDTO);
         return ResponseEntity.created(new URI("/api/appointments"))
             .headers(HeaderUtil.createAlert("appointment.messages.created", newAppointment.getDate().toString()))
             .body(newAppointment);
     }
 
     /**
-     * PUT /users : Updates an existing Appointment.
+     * PUT /users : Update an existing Appointment.
      *
      * @param appointmentDTO the appointment to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated appointment
@@ -71,10 +70,12 @@ public class AppointmentResource {
     @PutMapping("/appointments/{old_appointment_id}")
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
-    public ResponseEntity<Appointment> updateAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO, @PathVariable Long old_appointment_id) {
+    public ResponseEntity<Appointment> updateAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO, @PathVariable Long old_appointment_id) throws URISyntaxException  {
         log.debug("REST request to update Appointment : {}", appointmentDTO);
-        return ResponseUtil.wrapOrNotFound(appointmentService.updateAppointment(appointmentDTO, old_appointment_id),
-            HeaderUtil.createAlert("appointment.messages.updated", old_appointment_id.toString()));
+        Appointment updatedAppointment = appointmentService.updateAppointment(appointmentDTO, old_appointment_id);
+        return ResponseEntity.created(new URI("/api/appointments"))
+            .headers(HeaderUtil.createAlert("appointment.messages.updated", old_appointment_id.toString()))
+            .body(updatedAppointment);
     }
 
     /**
@@ -89,7 +90,9 @@ public class AppointmentResource {
     public ResponseEntity<Void> cancelAppointment(@PathVariable Long appointment_id) {
         log.debug("REST request to cancel an Appointment: {}", appointment_id);
         appointmentService.cancelAppointment(appointment_id);
-        return ResponseEntity.ok().headers(HeaderUtil.createAlert( "appointment.messages.canceled", appointment_id.toString())).build();
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createAlert( "appointment.messages.canceled", appointment_id.toString()))
+            .build();
     }
 
     /**
@@ -102,13 +105,13 @@ public class AppointmentResource {
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments(Pageable pageable) {
-        final Page<AppointmentDTO> page = appointmentService.getAllAppointment(pageable);
+        final Page<AppointmentDTO> page = appointmentService.getAllAppointment(pageable).map(AppointmentDTO::new);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     /**
-     * GET /appointments/:appointment_id : get the Appointment by ID.
+     * GET /appointments/:appointment_id : get an Appointment by ID.
      *
      * @param appointment_id the ID of the Appointment to find
      * @return the ResponseEntity with status 200 (OK) and with body the "id" doctor profile, or with status 404 (Not Found)
@@ -118,9 +121,9 @@ public class AppointmentResource {
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
     public ResponseEntity<AppointmentDTO> findAppointment(@PathVariable Long appointment_id) {
         log.debug("REST request to get Appointment : {}", appointment_id);
-        Optional<Appointment> oap = appointmentService.find(appointment_id);
-        System.out.println(oap.get());
-        return ResponseUtil.wrapOrNotFound(oap.map(AppointmentDTO::new));
+        return ResponseUtil.wrapOrNotFound(
+            appointmentService.find(appointment_id).map(AppointmentDTO::new)
+        );
     }
 
     /**
@@ -133,7 +136,9 @@ public class AppointmentResource {
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.DOCTOR + "\")")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsOfDoctor(Pageable pageable, @PathVariable Long doctor_user_id) {
-        final Page<AppointmentDTO> page = appointmentService.getAllAppointmentOfDoctor(pageable, doctor_user_id);
+        final Page<AppointmentDTO> page = appointmentService
+            .getAllAppointmentOfDoctor(pageable, doctor_user_id)
+            .map(AppointmentDTO::new);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments/doctor/"+doctor_user_id);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -148,9 +153,15 @@ public class AppointmentResource {
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsOfPatient(Pageable pageable, @PathVariable Long patient_id) {
-        final Page<AppointmentDTO> page = appointmentService.getAllAppointmentOfPatient(pageable, patient_id);
+        final Page<AppointmentDTO> page = appointmentService
+            .getAllAppointmentOfPatient(pageable, patient_id)
+            .map(AppointmentDTO::new);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments/doctor/"+patient_id);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(
+            page.getContent(),
+            headers,
+            HttpStatus.OK
+        );
     }
 
     /**
@@ -163,6 +174,7 @@ public class AppointmentResource {
     public List<AppointmentDTO> getAppointmentsOfDoctorByDate(@PathVariable Long doctor_id, @PathVariable Date date) {
         return appointmentService
             .getAppointmentsOfDoctorByDate(doctor_id, date)
+            .map(AppointmentDTO::new)
             .collect(Collectors.toList());
     }
 
@@ -174,6 +186,9 @@ public class AppointmentResource {
     @GetMapping("/appointments/available/{doctor_id}/{date}")
     @Timed
     public List<AppointmentDTO> getAvailableAppointmentsOfDoctorByDate(@PathVariable Long doctor_id, @PathVariable Date date) {
-        return appointmentService.getAvailableAppointmentsOfDoctorByDate(doctor_id, date);
+        return appointmentService
+            .getAvailableAppointmentsOfDoctorByDate(doctor_id, date)
+            .map(AppointmentDTO::new)
+            .collect(Collectors.toList());
     }
 }
