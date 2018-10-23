@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+    <property name="now" value="now()" dbms="mysql"/>
+    <property name="autoIncrement" value="true"/>
+    <changeSet id="00000000000002" author="bessemzitouni">
+        <!-- DOCTOR TABLE -->
+        <createTable tableName="doctor">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="varchar(50)"/>
+            <column name="address" type="varchar(254)"/>
+            <column name="gender" type="varchar(10)"/>
+            <column name="speciality" type="varchar(50)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="doctor"
+                                 constraintName="fk_doctor_user"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE" />
+
+        <!--APPOINTMENT TABLE -->
+        <createTable tableName="appointment">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="doctor_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="patient_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="date" type="DATE"/>
+            <column name="time_start" type="TIME"/>
+            <column name="time_end" type="TIME"/>
+            <column name="status" type="varchar(15)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="doctor_id"
+                                 baseTableName="appointment"
+                                 constraintName="fk_appointment_doctor"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doctor"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="appointment"
+                                 constraintName="fk_appointment_patient"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user" />
+        <!-- UPDATE DATA -->
+        <loadUpdateData file="config/liquibase/users.csv" separator=";" tableName="jhi_user" primaryKey="id"/>
+        <loadUpdateData file="config/liquibase/authorities.csv" separator=";" tableName="jhi_authority" primaryKey="name"/>
+        <loadUpdateData file="config/liquibase/users_authorities.csv" separator=";" tableName="jhi_user_authority" primaryKey="user_id, authority_name"/>
+
+        <!-- LOAD DATA -->
+        <loadData file="config/liquibase/doctors.csv" separator=";" tableName="doctor"/>
+        <loadData file="config/liquibase/appointments.csv" separator=";" tableName="appointment"/>
+    </changeSet>
+</databaseChangeLog>

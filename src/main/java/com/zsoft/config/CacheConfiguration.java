@@ -39,6 +39,12 @@ public class CacheConfiguration {
             cm.createCache(com.zsoft.domain.Authority.class.getName(), jcacheConfiguration);
             cm.createCache(com.zsoft.domain.User.class.getName() + ".authorities", jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
+
+            //extensions
+            cm.createCache(com.zsoft.domain.extension.AppointmentStatus.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.extension.Gender.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.extension.Appointment.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.extension.Doctor.class.getName(), jcacheConfiguration);
         };
     }
 }
