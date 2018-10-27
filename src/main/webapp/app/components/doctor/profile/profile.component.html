@@ -1,0 +1,120 @@
+<div class="row justify-content-center" *ngIf="doctor">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+            <h2 id="myDoctorLabel" jhiTranslate="doctor.managment.home.createOrEditLabel">
+                Create or edit a Doctor Profile
+            </h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+
+                <div class="form-group" [hidden]="!doctor.id">
+                    <label jhiTranslate="global.field.id">ID</label>
+                    <input type="text" class="form-control" name="id"
+                           [(ngModel)]="doctor.id" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.speciality">Speciality</label>
+                    <input type="text" class="form-control" name="speciality" #specialityInput="ngModel"
+                           [(ngModel)]="doctor.speciality" maxlength="50">
+
+                    <div *ngIf="specialityInput.dirty && specialityInput.invalid">
+                        <small class="form-text text-danger"
+                               *ngIf="specialityInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
+                               translateValues="{max: 50}">
+                            This field cannot be longer than 50 characters.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.phone">Phone</label>
+                    <input type="text" class="form-control" name="phone" #phoneInput="ngModel"
+                           [(ngModel)]="doctor.phone" maxlength="50">
+
+                    <div *ngIf="phoneInput.dirty && phoneInput.invalid">
+                        <small class="form-text text-danger"
+                               *ngIf="phoneInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
+                               translateValues="{max: 50}">
+                            This field cannot be longer than 50 characters.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.address">Address</label>
+                    <input type="text" class="form-control" name="address" #addressInput="ngModel"
+                           [(ngModel)]="doctor.address" maxlength="254">
+
+                    <div *ngIf="addressInput.dirty && addressInput.invalid">
+                        <small class="form-text text-danger"
+                               *ngIf="addressInput.errors.maxlength" jhiTranslate="entity.validation.maxlength"
+                               translateValues="{max: 254}">
+                            This field cannot be longer than 254 characters.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label jhiTranslate="doctor.managment.gender">Gender</label>
+                    <select class="form-control" id="gender" name="gender" [(ngModel)]="doctor.gender">
+                        <option value="MALE" >Male</option>
+                        <option value="FEMALE" >Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="doctor.managment.timeslots">Time Slots</label>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th jhiTranslate="doctor.managment.day">Day</th>
+                                <th jhiTranslate="doctor.managment.timeStart">Start time</th>
+                                <th jhiTranslate="doctor.managment.timeEnd">End time</th>
+                                <th jhiTranslate="doctor.actions.remove">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="timeSlots">
+                            <tr *ngFor="let timeslot of timeSlots">
+                                <td>
+                                    <select class="form-control" id="dayOfWeek-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][dayOfWeek]" [(ngModel)]="timeslot.dayOfWeek">
+                                        <option *ngFor="let day of days" [value]="days.indexOf(day)">{{day}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control" id="timeStart-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][timeStart]" [(ngModel)]="timeslot.timeStart">
+                                        <option *ngFor="let time of times" [value]="time">{{time}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control" id="timeEnd-{{timeslot.id}}" name="timeslot[{{timeslot.id}}][timeEnd]" [(ngModel)]="timeslot.timeEnd">
+                                        <option *ngFor="let time of times" [value]="time">{{time}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="removeTimeSlot(timeslot)">
+                                        <fa-icon [icon]="'trash-alt'"></fa-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                               <td colspan="5">
+                                   <button type="button" class="btn btn-block" (click)="addTimeSlot()">
+                                       <fa-icon [icon]="'plus'"></fa-icon>&nbsp;<span
+                                       jhiTranslate="doctor.actions.add">Add</span>
+                                   </button>
+                               </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-secondary" (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span
+                    jhiTranslate="entity.action.cancel">Cancel</span>
+                </button>
+                <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

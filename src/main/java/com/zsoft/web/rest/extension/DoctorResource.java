@@ -2,13 +2,16 @@ package com.zsoft.web.rest.extension;
 
 import com.codahale.metrics.annotation.Timed;
 import com.zsoft.domain.extension.Doctor;
+import com.zsoft.domain.extension.PersistentConfiguration;
 import com.zsoft.repository.extension.DoctorRepository;
 import com.zsoft.service.dto.extension.DoctorDTO;
 import com.zsoft.service.extension.DoctorService;
+import com.zsoft.service.mapper.extension.DoctorMapper;
 import com.zsoft.web.rest.errors.BadRequestAlertException;
 import com.zsoft.web.rest.util.HeaderUtil;
 import com.zsoft.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -37,13 +40,15 @@ public class DoctorResource {
 
     private final DoctorRepository doctorRepository;
 
+    private final DoctorMapper mapper = Mappers.getMapper(DoctorMapper.class);
+
     public DoctorResource(DoctorService doctorService, DoctorRepository doctorRepository) {
         this.doctorService = doctorService;
         this.doctorRepository = doctorRepository;
     }
 
     /**
-     * POST  /doctors  : Creates a new Doctor Profile.
+     * POST  /doctors  : Create a new Doctor Profile.
      * <p>
      * Creates a new doctor Profile if the user has ROLE_DOCTOR and Profile Not already exist
      * Create multi time slots linked to the doctor profile
@@ -55,7 +60,7 @@ public class DoctorResource {
      */
     @PostMapping("/doctors")
     @Timed
-    public ResponseEntity<Doctor> createDoctorProfile(@Valid @RequestBody DoctorDTO doctorDTO) throws URISyntaxException {
+    public ResponseEntity<DoctorDTO> createDoctorProfile(@Valid @RequestBody DoctorDTO doctorDTO) throws URISyntaxException {
         log.debug("REST request to create a new Doctor Profile : {}", doctorDTO);
         if (doctorDTO.getId() != null || doctorRepository.findDoctorByUser_Id(doctorDTO.getUserId()).isPresent()) {
             throw new BadRequestAlertException("Doctor profile Already exist !", "doctor.messages", "idexists");
@@ -63,13 +68,13 @@ public class DoctorResource {
             Doctor newDoctor = doctorService.createDoctorProfile(doctorDTO);
             return ResponseEntity.created(new URI("/api/doctors/profile"))
                 .headers(HeaderUtil.createAlert("doctor.messages.created", newDoctor.getId().toString()))
-                .body(newDoctor);
+                .body(mapper.toDto(newDoctor));
         }
     }
 
 
     /**
-     * PUT /doctors : Updates an existing Doctor Profile.
+     * PUT /doctors : Update an existing Doctor Profile.
      *
      * @param doctorDTO the Doctor Profile to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated doctor profile
@@ -111,7 +116,11 @@ public class DoctorResource {
     @Timed
     public ResponseEntity<DoctorDTO> findDoctorProfile(@PathVariable Long doctor_id) {
         log.debug("REST request to get Doctor Profile : {}", doctor_id);
-        return ResponseUtil.wrapOrNotFound(doctorService.find(doctor_id).map(DoctorDTO::new));
+        return ResponseUtil.wrapOrNotFound(
+            doctorService
+                .find(doctor_id)
+                .map(mapper::toDto)
+        );
     }
 
     /**
@@ -124,6 +133,44 @@ public class DoctorResource {
     @Timed
     public ResponseEntity<DoctorDTO> findDoctorProfileByUserId(@PathVariable Long user_id) {
         log.debug("REST request to get Doctor Profile : {}", user_id);
-        return ResponseUtil.wrapOrNotFound(doctorService.findByUserId(user_id).map(DoctorDTO::new));
+        return ResponseUtil.wrapOrNotFound(
+            doctorService
+                .findByUserId(user_id)
+                .map(mapper::toDto)
+        );
+    }
+
+
+    /**
+     * PUT /doctors : Update a Doctor Configuration.
+     *
+     * @param doctor_id the Doctor Profile ID
+     * @param configurations the list of configuration to update
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @PutMapping("/doctors/configuration/{doctor_id}")
+    @Timed
+    public ResponseEntity<Void> updateDoctorConfigurations(@PathVariable Long doctor_id, @Valid @RequestBody List<PersistentConfiguration> configurations) {
+        log.debug("REST request to update Doctor Configuration : {}", doctor_id);
+        if ( doctor_id == null || !doctorRepository.findById(doctor_id).isPresent()) {
+            throw new BadRequestAlertException("Doctor profile not found", "doctor.messages", "notexist");
+        } else {
+            // delete old and create new configurations
+            doctorService.updateConfigurations(doctor_id, configurations);
+            return ResponseEntity.ok().headers(HeaderUtil.createAlert( "doctor.messages.updateConfigurations", doctor_id.toString())).build();
+        }
+    }
+
+    /**
+     * GET /doctors/configuration/:doctor_id : get the "id" doctor profile.
+     *
+     * @param doctor_id the doctor profile id
+     * @return the ResponseEntity with status 200 (OK) and with body all doctor configurations
+     */
+    @GetMapping("/doctors/configuration/{doctor_id}")
+    @Timed
+    public List<PersistentConfiguration> getDoctorConfiguration(@PathVariable Long doctor_id) {
+        log.debug("REST request to get Doctor Profile : {}", doctor_id);
+        return doctorService.getDoctorConfigurations(doctor_id);
     }
 }

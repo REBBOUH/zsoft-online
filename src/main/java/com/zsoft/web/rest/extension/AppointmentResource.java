@@ -1,14 +1,15 @@
 package com.zsoft.web.rest.extension;
 
 import com.codahale.metrics.annotation.Timed;
-import com.zsoft.domain.extension.Appointment;
 import com.zsoft.security.AuthoritiesConstants;
 import com.zsoft.service.dto.extension.AppointmentDTO;
 import com.zsoft.service.extension.AppointmentService;
+import com.zsoft.service.mapper.extension.AppointmentMapper;
 import com.zsoft.web.rest.errors.BadRequestAlertException;
 import com.zsoft.web.rest.util.HeaderUtil;
 import com.zsoft.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,8 @@ public class AppointmentResource {
 
     private final AppointmentService appointmentService;
 
+    private AppointmentMapper mapper = Mappers.getMapper(AppointmentMapper.class);
+
     public AppointmentResource(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
@@ -53,9 +56,9 @@ public class AppointmentResource {
     @PostMapping("/appointments")
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
-    public ResponseEntity<Appointment> takeAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) throws URISyntaxException {
+    public ResponseEntity<AppointmentDTO> takeAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) throws URISyntaxException {
         log.debug("REST request to save Appointment : {}", appointmentDTO);
-        Appointment newAppointment = appointmentService.takeAppointment(appointmentDTO);
+        AppointmentDTO newAppointment = appointmentService.takeAppointment(appointmentDTO);
         return ResponseEntity.created(new URI("/api/appointments"))
             .headers(HeaderUtil.createAlert("appointment.messages.created", newAppointment.getDate().toString()))
             .body(newAppointment);
@@ -70,9 +73,9 @@ public class AppointmentResource {
     @PutMapping("/appointments/{old_appointment_id}")
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.USER + "\")")
-    public ResponseEntity<Appointment> updateAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO, @PathVariable Long old_appointment_id) throws URISyntaxException  {
+    public ResponseEntity<AppointmentDTO> updateAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO, @PathVariable Long old_appointment_id) throws URISyntaxException  {
         log.debug("REST request to update Appointment : {}", appointmentDTO);
-        Appointment updatedAppointment = appointmentService.updateAppointment(appointmentDTO, old_appointment_id);
+        AppointmentDTO updatedAppointment = appointmentService.updateAppointment(appointmentDTO, old_appointment_id);
         return ResponseEntity.created(new URI("/api/appointments"))
             .headers(HeaderUtil.createAlert("appointment.messages.updated", old_appointment_id.toString()))
             .body(updatedAppointment);
@@ -105,7 +108,9 @@ public class AppointmentResource {
     @Timed
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments(Pageable pageable) {
-        final Page<AppointmentDTO> page = appointmentService.getAllAppointment(pageable).map(AppointmentDTO::new);
+        final Page<AppointmentDTO> page = appointmentService
+            .getAllAppointment(pageable)
+            .map(mapper::toDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -122,7 +127,8 @@ public class AppointmentResource {
     public ResponseEntity<AppointmentDTO> findAppointment(@PathVariable Long appointment_id) {
         log.debug("REST request to get Appointment : {}", appointment_id);
         return ResponseUtil.wrapOrNotFound(
-            appointmentService.find(appointment_id).map(AppointmentDTO::new)
+            appointmentService.find(appointment_id)
+                .map(mapper::toDto)
         );
     }
 
@@ -138,7 +144,7 @@ public class AppointmentResource {
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsOfDoctor(Pageable pageable, @PathVariable Long doctor_user_id) {
         final Page<AppointmentDTO> page = appointmentService
             .getAllAppointmentOfDoctor(pageable, doctor_user_id)
-            .map(AppointmentDTO::new);
+            .map(mapper::toDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments/doctor/"+doctor_user_id);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -155,7 +161,7 @@ public class AppointmentResource {
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsOfPatient(Pageable pageable, @PathVariable Long patient_id) {
         final Page<AppointmentDTO> page = appointmentService
             .getAllAppointmentOfPatient(pageable, patient_id)
-            .map(AppointmentDTO::new);
+            .map(mapper::toDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/appointments/doctor/"+patient_id);
         return new ResponseEntity<>(
             page.getContent(),
@@ -174,7 +180,8 @@ public class AppointmentResource {
     public List<AppointmentDTO> getAppointmentsOfDoctorByDate(@PathVariable Long doctor_id, @PathVariable Date date) {
         return appointmentService
             .getAppointmentsOfDoctorByDate(doctor_id, date)
-            .map(AppointmentDTO::new)
+            .stream()
+            .map(mapper::toDto)
             .collect(Collectors.toList());
     }
 
@@ -185,10 +192,12 @@ public class AppointmentResource {
      */
     @GetMapping("/appointments/available/{doctor_id}/{date}")
     @Timed
-    public List<AppointmentDTO> getAvailableAppointmentsOfDoctorByDate(@PathVariable Long doctor_id, @PathVariable Date date) {
+    public List<AppointmentDTO> getAvailableAppointmentsOfDoctorByDate(@PathVariable Long doctor_id,@Valid @PathVariable Date date) {
         return appointmentService
             .getAvailableAppointmentsOfDoctorByDate(doctor_id, date)
-            .map(AppointmentDTO::new)
+            .stream()
+            //.filter(appointment -> appointment.getDate().getTime() > System.currentTimeMillis() )
+            .map(mapper::toDto)
             .collect(Collectors.toList());
     }
 }

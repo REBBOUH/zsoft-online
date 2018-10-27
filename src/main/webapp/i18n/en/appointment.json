@@ -1,0 +1,57 @@
+{
+    "appointment": {
+        "managment": {
+            "home": {
+                "title": "Appointments"
+            },
+            "myappointments": {
+                "title": "My Appointments"
+            },
+            "myappointmentsasdoctor": {
+                "title": "My Appointments As Doctor"
+            },
+            "view": {
+                "title": "Appointment"
+            },
+            "update": {
+                "title": "Update an appointment"
+            },
+            "take": {
+                "takeAppointment": "Take an appointment"
+            },
+            "cancel": {
+                "title": "Confirm cancel an Appointment",
+                "question": "Are you sure you want to cancel this Appointment?"
+            },
+            "doctor": "Doctor",
+            "patient": "Patient",
+            "date": "Date",
+            "time": "Time",
+            "status": "Status",
+            "timeStart": "Time Start",
+            "timeEnd": "Time End",
+            "panding": "Pending",
+            "canceled": "Canceled",
+            "passed": "Passed"
+        },
+        "messages": {
+            "created": "A new appointment is created at date {{ param }}",
+            "updated": "An appointment is updated with identifier {{ param }}",
+            "canceled": "An appointment is canceled with identifier {{ param }}"
+        },
+        "menu": {
+            "main": "Appointments",
+            "take": "Take Appointment",
+            "myappointments": "My Appointments",
+            "myappointmentsasdoctor": "My Appointments as Doctor",
+            "allappointments": "All Appointments"
+        },
+        "actions": {
+            "update": "Update",
+            "cancel": "Cancel",
+            "yes": "Yes",
+            "no": "No",
+            "ok": "Ok"
+        }
+    }
+}

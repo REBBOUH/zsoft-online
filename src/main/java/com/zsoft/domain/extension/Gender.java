@@ -1,7 +1,7 @@
 package com.zsoft.domain.extension;
 
 public enum Gender {
-    MALE ("FEMALE"),
+    MALE ("MALE"),
     FEMALE ("FEMALE");
 
     private final String gender;

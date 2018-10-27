@@ -1,6 +1,5 @@
 package com.zsoft.domain.extension;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zsoft.domain.User;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -39,7 +38,6 @@ public class Doctor implements Serializable {
     @Column(length = 50)
     private String speciality;
 
-    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id")
     private Set<Appointment> appointments;

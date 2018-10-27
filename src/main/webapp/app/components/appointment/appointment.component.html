@@ -1,0 +1,62 @@
+<div>
+    <h2>
+        <span id="appointment-management-page-heading" jhiTranslate="appointment.managment.home.title">Appointments</span>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="table-responsive" *ngIf="appointments">
+        <table class="table table-striped">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+                <th *ngIf="loadBy=='all'||loadBy=='my'"><span jhiTranslate="appointment.managment.doctor">Doctor</span></th>
+                <th *ngIf="loadBy=='all'||loadBy=='doctor'"><span jhiTranslate="appointment.managment.patient">Patient</span> </th>
+                <th jhiSortBy="date"><span jhiTranslate="appointment.managment.date">Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="timeStart"><span jhiTranslate="appointment.managment.time">Time</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="status"><span jhiTranslate="appointment.managment.status">Status</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody *ngIf ="appointments">
+            <tr *ngFor="let appointment of appointments; trackBy: trackIdentity" class="{{appointment.status=='Canceled'?'text-muted':''}}">
+                <td *ngIf="loadBy=='all'||loadBy=='my'">Dr.{{appointment.doctorName}}</td>
+                <td *ngIf="loadBy=='all'||loadBy=='doctor'">{{appointment.patientName}}</td>
+                <td>{{appointment.date | date:'dd/MM/yyyy'}}</td>
+                <td>{{appointment.timeStart}} - {{appointment.timeEnd}}</td>
+                <td>
+                    <span class="badge badge-info" *ngIf="appointment.status=='PENDING'" jhiTranslate="appointment.managment.panding">
+                        PENDING
+                    </span>
+                    <span class="badge badge-dark" *ngIf="appointment.status=='CANCELED'" jhiTranslate="appointment.managment.canceled">
+                        CANCELED
+                    </span>
+                    <span class="badge badge-success" *ngIf="appointment.status=='PASSED'" jhiTranslate="appointment.managment.passed">
+                        PASSED
+                    </span>
+                    <span class="badge badge-light" *ngIf="appointment.status=='FREE'" jhiTranslate="appointment.managment.free">
+                        FREE
+                    </span>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="button" (click)="viewAppointment(appointment)" class="btn btn-info btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="button" (click)="cancelAppointment(appointment)" class="btn btn-danger btn-sm" *ngIf="appointment.status=='PENDING'">
+                            <fa-icon [icon]="'trash'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="appointment.actions.cancel">Cancel</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="appointments">
+        <div class="row justify-content-center">
+            <jhi-item-count [page]="page" [total]="queryCount" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+        </div>
+        <div class="row justify-content-center">
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage(page)"></ngb-pagination>
+        </div>
+    </div>
+</div>

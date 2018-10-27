@@ -45,6 +45,7 @@ public class CacheConfiguration {
             cm.createCache(com.zsoft.domain.extension.Gender.class.getName(), jcacheConfiguration);
             cm.createCache(com.zsoft.domain.extension.Appointment.class.getName(), jcacheConfiguration);
             cm.createCache(com.zsoft.domain.extension.Doctor.class.getName(), jcacheConfiguration);
+            cm.createCache(com.zsoft.domain.extension.PersistentConfiguration.class.getName(), jcacheConfiguration);
         };
     }
 }

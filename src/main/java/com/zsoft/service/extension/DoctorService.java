@@ -1,9 +1,12 @@
 package com.zsoft.service.extension;
 
 import com.zsoft.domain.extension.Doctor;
+import com.zsoft.domain.extension.PersistentConfiguration;
 import com.zsoft.repository.UserRepository;
 import com.zsoft.repository.extension.DoctorRepository;
 import com.zsoft.service.dto.extension.DoctorDTO;
+import com.zsoft.service.mapper.extension.DoctorMapper;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -11,7 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -23,12 +30,22 @@ public class DoctorService {
 
     private final UserRepository userRepository;
 
+    private final PersistentConfigurationService configurationService;
+
+    private final AppointmentService appointmentService;
+
+    private final DoctorMapper mapper = Mappers.getMapper(DoctorMapper.class);
+
     public DoctorService(
         DoctorRepository doctorRepository,
+        PersistentConfigurationService configurationService,
+        AppointmentService appointmentService,
         UserRepository userRepository
     ) {
         this.doctorRepository = doctorRepository;
         this.userRepository = userRepository;
+        this.configurationService = configurationService;
+        this.appointmentService = appointmentService;
     }
 
     /**
@@ -42,7 +59,7 @@ public class DoctorService {
             throw new IllegalArgumentException("Illegal Arguments, User Not Found !");
         }
         log.debug("Created Information for Doctor Profile : {}", doctorDTO);
-        return doctorRepository.saveAndFlush(doctorDTO.toDoctor());
+        return doctorRepository.saveAndFlush(mapper.toEntity(doctorDTO));
     }
 
     /**
@@ -56,11 +73,14 @@ public class DoctorService {
             throw new IllegalArgumentException("Illegal Arguments, User Not Found !");
         }
         return doctorRepository.findById(doctorDTO.getId())
-            .map(doctor -> {
+            .map(currentDoctor -> {
                 log.debug("Changed Information for Doctor Profile: {}", doctorDTO);
-                return doctorRepository.saveAndFlush(doctorDTO.toDoctor(doctor));
+                Doctor doctor = mapper.toEntity(doctorDTO);
+                doctor.setAppointments(currentDoctor.getAppointments());
+                doctor.setId(currentDoctor.getId());
+                return doctorRepository.saveAndFlush(doctor);
             })
-            .map(DoctorDTO::new);
+            .map(mapper::toDto);
     }
 
 
@@ -71,7 +91,9 @@ public class DoctorService {
      */
     @Transactional(readOnly = true)
     public Page<DoctorDTO> getAllDoctors(Pageable pageable) {
-        return doctorRepository.findAll(pageable).map(DoctorDTO::new);
+        return doctorRepository
+            .findAll(pageable)
+            .map(mapper::toDto);
     }
 
 
@@ -94,5 +116,30 @@ public class DoctorService {
      */
     public Optional<Doctor> findByUserId(Long user_id) {
         return doctorRepository.findDoctorByUser_Id(user_id);
+    }
+
+
+    /**
+     * Update all configurations for a specific doctor profile.
+     */
+    public void updateConfigurations(Long doctor_id, List<PersistentConfiguration> configurations) {
+        log.debug("Changed configurations for Doctor Profile: {}", doctor_id);
+        // RESET CONFIGURATIONS
+        configurationService.deleteByEntityAndEntityId("DOCTOR", doctor_id);
+        configurations.forEach(configurationService::add);
+        // RESET DOCTOR APPOINTMENTS
+        appointmentService.resetNextAppointments(doctor_id);
+    }
+
+    public List<PersistentConfiguration> getDoctorConfigurations(Long doctor_id) {
+        List<PersistentConfiguration> result = new ArrayList<>();
+        Stream<PersistentConfiguration> configurations = configurationService.getByEntityAndEntityId("DOCTOR", doctor_id);
+        configurations.forEach(conf -> {
+            result.add(conf);
+            configurationService
+                .getByEntityAndEntityId(conf.getKey(), Long.parseLong(conf.getValue()))
+                .forEach(result::add);
+        });
+        return result;
     }
 }

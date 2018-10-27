@@ -71,7 +71,7 @@
         <loadUpdateData file="config/liquibase/users_authorities.csv" separator=";" tableName="jhi_user_authority" primaryKey="user_id, authority_name"/>
 
         <!-- LOAD DATA -->
-        <loadData file="config/liquibase/doctors.csv" separator=";" tableName="doctor"/>
-        <loadData file="config/liquibase/appointments.csv" separator=";" tableName="appointment"/>
+        <loadData file="config/liquibase/extension/doctors.csv" separator=";" tableName="doctor"/>
+        <loadData file="config/liquibase/extension/appointments.csv" separator=";" tableName="appointment"/>
     </changeSet>
 </databaseChangeLog>

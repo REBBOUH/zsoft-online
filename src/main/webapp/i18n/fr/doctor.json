@@ -1,0 +1,36 @@
+{
+    "doctor": {
+        "managment": {
+            "home": {
+                "title": "Médecins",
+                "createOrEditLabel": "Créer ou modifier un profil de médecin"
+            },
+            "myprofile": {
+                "title": "Mon profil"
+            },
+            "name": "Nom",
+            "phone": "Téléphone",
+            "email": "Adresse E-mail",
+            "speciality": "Spécialité",
+            "address": "Adresse",
+            "gender": "Le sexe",
+            "timeslots": "Les Créneau horaire",
+            "doctorprofile": "Médecins profil",
+            "day": "Jour",
+            "timeStart": "Heure de début",
+            "timeEnd": "Heure de fin"
+        },
+        "messages": {
+            "created": "Un nouveau profil de docteur est créé avec l'identifiant {{ param }}",
+            "updated": "Un profil de docteur est modfiée avec l'identifiant {{ param }}"
+        },
+        "menu": {
+            "mydoctorprofile": "Mon profil médecin",
+            "alldoctors": "Tous les médecin"
+        },
+        "actions": {
+            "add": "Ajouter",
+            "remove": "Supprimer"
+        }
+    }
+}

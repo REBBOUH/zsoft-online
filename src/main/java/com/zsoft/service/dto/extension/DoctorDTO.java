@@ -1,13 +1,6 @@
 package com.zsoft.service.dto.extension;
 
-import com.zsoft.domain.User;
-import com.zsoft.domain.extension.Appointment;
-import com.zsoft.domain.extension.Doctor;
-import com.zsoft.domain.extension.Gender;
-
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DoctorDTO {
     private Long id;
@@ -26,63 +19,7 @@ public class DoctorDTO {
 
     private Long userId;
 
-    private User userDTO;
-
-    private Set<AppointmentDTO> appointments;
-
     public DoctorDTO() {
-    }
-
-    public DoctorDTO(Doctor doctor) {
-        System.out.println(doctor);
-        this.id = doctor.getId();
-        this.phone = doctor.getPhone();
-        this.address = doctor.getAddress();
-        if( doctor.getGender() != null )
-            this.gender = doctor.getGender().toString();
-        this.speciality = doctor.getSpeciality();
-        if( doctor.getUser() != null )
-            this.userId = doctor.getUser().getId();
-        this.userDTO = doctor.getUser();
-        this.appointments = new HashSet<>();
-        if( doctor.getAppointments() != null )
-            for (Appointment appointment: doctor.getAppointments()) {
-                this.appointments.add(new AppointmentDTO(appointment));
-            }
-    }
-
-
-    public Doctor toDoctor() {
-        return this.toDoctor(new Doctor());
-    }
-
-    public Doctor toDoctor(Doctor doctor){
-        // set Profile informations
-        doctor.setPhone(this.getPhone());
-        doctor.setAddress(this.getAddress());
-        try {
-            doctor.setGender(Gender.valueOf(this.getGender()));
-        }
-        catch (Exception ex)
-        {
-            throw new IllegalArgumentException("Illegal Argument, Gender Type not found !");
-        }
-        doctor.setSpeciality(this.getSpeciality());
-
-        // create appointments
-        Set<Appointment> appointments = new HashSet<>();
-        if( this.getAppointments() != null )
-            for (AppointmentDTO appointment: this.getAppointments()) {
-                appointments.add(appointment.toAppointment());
-            }
-        doctor.setAppointments(appointments);
-
-        // set profile user
-        User user = new User();
-        user.setId(this.getUserId());
-        doctor.setUser(user);
-
-        return doctor;
     }
 
     public Long getId() {
@@ -133,22 +70,6 @@ public class DoctorDTO {
         this.userId = userId;
     }
 
-    public User getUserDTO() {
-        return userDTO;
-    }
-
-    public void setUserDTO(User userDTO) {
-        this.userDTO = userDTO;
-    }
-
-    public Set<AppointmentDTO> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(Set<AppointmentDTO> appointments) {
-        this.appointments = appointments;
-    }
-
     @Override
     public String toString() {
         return "DoctorDTO{" +
@@ -158,7 +79,6 @@ public class DoctorDTO {
             ", gender='" + gender + '\'' +
             ", speciality='" + speciality + '\'' +
             ", userId=" + userId +
-            ", userDTO=" + userDTO +
             '}';
     }
 }

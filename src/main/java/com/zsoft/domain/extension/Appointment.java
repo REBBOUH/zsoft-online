@@ -112,9 +112,9 @@ public class Appointment implements Serializable {
     public String toString() {
         return "Appointment{" +
             "id=" + id +
-            ", doctor=" + (doctor!=null?(doctor.getUser().getLastName() + " " + doctor.getUser().getFirstName()):"-")  +
-            ", patient=" + (patient!=null?(patient.getLastName() + " " + patient.getFirstName()):"-") +
-            ", status=" + status.toString() +
+            ", doctor=" + doctor  +
+            ", patient=" + patient +
+            ", status=" + status +
             ", date=" + date +
             ", timeStart=" + timeStart +
             ", timeEnd=" + timeEnd +

@@ -1,50 +1,30 @@
 package com.zsoft.service.dto.extension;
 
-import com.zsoft.domain.User;
-import com.zsoft.domain.extension.Appointment;
-import com.zsoft.domain.extension.AppointmentStatus;
-import com.zsoft.domain.extension.Doctor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.Size;
 import java.sql.Date;
-import java.sql.Time;
 
 public class AppointmentDTO {
     private Long id;
 
-    private Doctor doctor;
+    private Long doctorId;
 
-    private User patient;
+    private Long patientId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
 
-    private Time timeStart;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+    private Date timeStart;
 
-    private Time timeEnd;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+    private Date timeEnd;
 
     @Size(max = 15)
     private String status;
 
-    public AppointmentDTO(Appointment appointment) {
-        this.id = appointment.getId();
-        this.doctor = appointment.getDoctor();
-        this.patient = appointment.getPatient();
-        this.date = appointment.getDate();
-        this.timeStart = appointment.getTimeStart();
-        this.timeEnd = appointment.getTimeEnd();
-        this.status = appointment.getStatus().toString();
-    }
-
-    public Appointment toAppointment() {
-        Appointment ap = new Appointment();
-        ap.setId(this.getId());
-        ap.setDoctor(this.getDoctor());
-        ap.setPatient(this.getPatient());
-        ap.setDate(this.getDate());
-        ap.setTimeStart(this.getTimeStart());
-        ap.setTimeEnd(this.getTimeEnd());
-        ap.setStatus(AppointmentStatus.valueOf(this.getStatus()));
-        return ap;
+    public AppointmentDTO() {
     }
 
     public Long getId() {
@@ -55,20 +35,20 @@ public class AppointmentDTO {
         this.id = id;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Long getDoctorId() {
+        return doctorId;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 
-    public User getPatient() {
-        return patient;
+    public Long getPatientId() {
+        return patientId;
     }
 
-    public void setPatient(User patient) {
-        this.patient = patient;
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
 
     public Date getDate() {
@@ -79,19 +59,19 @@ public class AppointmentDTO {
         this.date = date;
     }
 
-    public Time getTimeStart() {
+    public Date getTimeStart() {
         return timeStart;
     }
 
-    public void setTimeStart(Time timeStart) {
+    public void setTimeStart(Date timeStart) {
         this.timeStart = timeStart;
     }
 
-    public Time getTimeEnd() {
+    public Date getTimeEnd() {
         return timeEnd;
     }
 
-    public void setTimeEnd(Time timeEnd) {
+    public void setTimeEnd(Date timeEnd) {
         this.timeEnd = timeEnd;
     }
 
@@ -107,8 +87,8 @@ public class AppointmentDTO {
     public String toString() {
         return "AppointmentDTO{" +
             "id=" + id +
-            ", doctor=" + doctor +
-            ", patient=" + patient +
+            ", doctorId=" + doctorId +
+            ", patientId=" + patientId +
             ", date=" + date +
             ", timeStart=" + timeStart +
             ", timeEnd=" + timeEnd +
